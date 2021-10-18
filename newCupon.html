@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/signup.css">
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <!-- link font awesome icon -->
+    <script src="https://kit.fontawesome.com/af4e5ff284.js" crossorigin="anonymous"></script>
+
+    <!-- font family -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+
+    <script>
+      $(document).ready(function(){
+        $('#icon').click(function(){
+          $('ul').toggleClass('show');
+        });
+      });
+    </script>
+    
+</head>
+<body>
+
+    <header>
+        <nav>
+          <label class="logo"><i class="fas fa-utensils"></i> Khuda Lagse Naki! Admin</label>
+          <ul>
+            <li><a href="foods.html">Foods</a></li>
+            <li><a href="users.html">Users</a></li>
+            <li><a href="orders.html">Confirm Orders</a></li>   
+            <li><a href="pending.html">Pending Orders</a></li>  
+            <li><a href="cupons.html">Cupons</a></li>
+            <li><a href="newCupon.html">New Cupon</a></li>
+          </ul>
+          <label id="icon">
+            <i class="fas fa-bars"></i>
+          </label>
+        </nav>
+    </header>
+
+
+    <section  class="w-50 mx-auto">
+        <h2>New Cupons</h2>
+        <form style="font-weight: bold;" id="formElem" action="post" >
+
+            <label for="inputEmail4" class="form-label"> Cupon Name</label>
+            <br>
+            <input type="text" placeholder="Cupon Name" id="cupon_name" size="30"/>
+            <br>
+        
+            <label for="inputEmail4" class="form-label"> Cupon Code</label>
+            <br>
+            <input type="text" placeholder="Cupon Code" id="cupon_code" size="30"/>
+            <br>
+            <label for="inputEmail4" class="form-label"> Reduced Price</label>
+            <br>
+            <input type="text" placeholder="Reduced Price" id="reduced_price" size="30"/>
+            <br>
+            <label for="inputEmail4" class="form-label"> Minimum Ordered Price</label>
+            <br>
+            <input type="text" placeholder="Minimum Ordered Price" id="orderd_price" size="30"/>
+            <br>
+            <label for="inputEmail4" class="form-label">Maximum Use</label>
+            <br>
+            <input type="text" placeholder="Maximum Use" id="maximum_use" size="30"/>
+            <br>
+            <label for="inputEmail4" class="form-label"> Quantity</label>
+            <br>
+            <input type="text" placeholder="Quantity" id="quantity" size="30"/>
+            <br>
+        
+            
+            <input type="submit" value="Submit" id="submit"/>
+        </form>
+    </section>
+
+    <script>
+
+        formElem.onsubmit = async (e) => {
+          e.preventDefault();
+        
+        
+        const cuponName = document.getElementById('cupon_name').value;
+        const cuponCode = document.getElementById('cupon_code').value;
+        const reducedPrice = document.getElementById('reduced_price').value;
+        const orderdPrice = document.getElementById('orderd_price').value;
+        const maximumUse = document.getElementById('maximum_use').value;
+        const quantity = document.getElementById('quantity').value;
+        
+        
+        const params = {
+            name: cuponName,
+            code : cuponCode,
+            value: reducedPrice,
+            minCost: orderdPrice,
+            maxUse: maximumUse,
+            quantity : quantity
+            }
+            var queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+
+
+
+        let response = await fetch('https://calm-garden-13016.herokuapp.com/cupons', {
+            method: 'POST',
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}, // this line is important, if this content-type is not set it wont work
+            body: queryString,
+
+        });
+
+            let res = await response.json();
+            if(res.msg == "Cupon was added successfully" ){
+                alert('Cupon was added successfully');
+
+            }
+            else{
+                alert('fill the form carefully');
+            }
+
+
+    }
+
+    </script>
+</body>
+</html>

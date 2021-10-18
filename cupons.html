@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/signup.css">
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <!-- link font awesome icon -->
+    <script src="https://kit.fontawesome.com/af4e5ff284.js" crossorigin="anonymous"></script>
+
+    <!-- font family -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+
+    <script>
+      $(document).ready(function(){
+        $('#icon').click(function(){
+          $('ul').toggleClass('show');
+        });
+      });
+    </script>
+</head>
+<body>
+
+    <header>
+        <nav>
+          <label class="logo"><i class="fas fa-utensils"></i> Khuda Lagse Naki! Admin</label>
+          <ul>
+            <li><a href="foods.html">Foods</a></li>
+            <li><a href="users.html">Users</a></li>
+            <li><a href="orders.html">Confirm Orders</a></li>   
+            <li><a href="pending.html">Pending Orders</a></li>
+            <li><a href="cupons.html">Cupons</a></li>
+            <li><a href="newCupon.html">New Cupon</a></li>
+          </ul>
+          <label id="icon">
+            <i class="fas fa-bars"></i>
+          </label>
+        </nav>
+      </header>
+
+      <h3>All cupons are here</h3>
+
+      <section class="d-flex justify-content-center ps-2">
+        <table class="table w-50 text-center"id="cupon-table">
+            
+            <tr>
+              <th>Cupon Name</th>
+              <th>Cupon Code</th>
+              <th>Reduced Price</th>
+              <th>Minimum Ordered Price</th>
+              <th>Maximum Use</th>
+              <th>Update MaxUse</th>
+              <th>Quantity</th>
+              <th>Update Quantity</th>
+              <th class="ps-5">Update</th>
+              <th>Remove</th>
+              
+            </tr>
+        </table>
+    </section>
+
+    
+
+    <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+    crossorigin="anonymous"
+  ></script>
+
+  <script>
+      const cupon = () =>{
+          fetch ('https://calm-garden-13016.herokuapp.com/admin/allcupons')
+          .then(res => res.json())
+          .then(data => cuponShow(data));
+      }
+      const cuponShow = (cupons) =>{
+        console.log(cupons);
+        const cuponTable = document.getElementById('cupon-table');
+        for(const cupon of cupons){
+            console.log(cupon);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <tr>
+                    <td> ${cupon.name}</td>
+                    <td> ${cupon.code}</td>
+                    <td> ${cupon.value}</td>
+                    <td> ${cupon.minCost}</td>
+                    <td> ${cupon.maxUse} </td>
+                    <td><input type="number" id="input-maxuse-${cupon._id}"></input></td>
+                    <td> ${cupon.quantity} </td>
+                    <td><input type="number" id="input-quantity-${cupon._id}"></input></td>
+                    <td><button style="background-color: blue; border-radius: 5px; color: white" onclick="updateCupon('${cupon._id}')">Update</button></td>
+                    <td><button style="background-color: red; border-radius: 5px; color: white" onclick="deleteCupon('${cupon._id}')">Remove</button></td>
+                </tr>
+            `
+            cuponTable.appendChild(tr);
+        }
+      }
+
+      const updateCupon = async (cuponId) =>{
+        const inputMaxUse = document.getElementById(`input-maxuse-${cuponId}`).value;
+        const inputQuantity = document.getElementById(`input-quantity-${cuponId}`).value;
+
+        console.log(cuponId, inputMaxUse, inputQuantity);
+
+        if(inputMaxUse != "" && inputQuantity != ""){
+            const params = {
+              id: cuponId,
+              maxUse : inputMaxUse,
+              quantity : inputQuantity
+            }
+
+            var queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+
+
+            let response = await fetch('https://calm-garden-13016.herokuapp.com/admin/cupon/update', {
+                method: 'PUT',
+                headers: {'Content-Type':'application/x-www-form-urlencoded'}, // this line is important, if this content-type is not set it wont work
+                body: queryString,
+            });
+
+            let res = await response.json();
+            console.log(res);
+          }else{
+            alert("Please, enter some value in update field then click update button...");
+          }
+
+          location.reload();
+      }
+
+      const deleteCupon = async (id) =>{
+          const params = {
+                    id : id,
+                  }
+                  var queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+
+
+          let response = await fetch('https://calm-garden-13016.herokuapp.com/delete_cupon', {
+            method: 'DELETE',
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}, // this line is important, if this content-type is not set it wont work
+            body: queryString,
+
+              });
+
+            let res = await response.json();
+            console.log(res);
+            console.log(id,'clicked');
+            alert(res.msg);
+            location.reload();
+        }
+
+      cupon();
+  </script>
+
+    
+</body>
+</html>
